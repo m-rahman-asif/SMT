@@ -2,24 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import "package:smt/providers/login_provider.dart";
 import "package:smt/providers/APIrepository.dart";
-import 'package:smt/screens/forgot_password_screen';
-import 'package:smt/screens/locations_screen.dart';
+import 'package:smt/screens/forgot_password_screen.dart';
+import 'package:smt/screens/locations_screen.dart'; // Ensure this matches your filename
 import 'package:smt/screens/signup_screen.dart';
 
-// We use a ConsumerStatefulWidget so we can manage the lifecycle of our Controllers
 class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({super.key}); // FIXED: Constructor must match class name
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  // 1. Declare the controllers
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  // 2. Always dispose of controllers to prevent memory leaks
   @override
   void dispose() {
     _emailController.dispose();
@@ -27,11 +24,54 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
+  // --- THE CORE CRUD LOGIC (READ) ---
+  Future<void> _handleLogin() async {
+  final email = _emailController.text.trim().toLowerCase();
+  final password = _passwordController.text.trim();
+
+  if (email.isEmpty || password.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Please fill in all fields')),
+    );
+    return;
+  }
+
+  ref.read(loginLoadingProvider.notifier).state = true;
+
+  try {
+    // 1. Call the new login API
+    final result = await ref.read(authRepositoryProvider).login(email, password);
+
+    // 2. If successful, navigate to the next screen
+    if (mounted) {
+      // Note: Adjust result['user_id'] based on what your specific API returns
+      final userId = result['user_id']?.toString() ?? result['id']?.toString() ?? 'unknown';
+      
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LocationScreen(userId: userId),
+        ),
+      );
+    }
+  } catch (e) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()), 
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  } finally {
+    ref.read(loginLoadingProvider.notifier).state = false;
+  }
+}
+
   @override
   Widget build(BuildContext context) {
     final rememberMe = ref.watch(rememberMeProvider);
-    final isLoading =
-        ref.watch(loginLoadingProvider); // Listen to loading state
+    final isLoading = ref.watch(loginLoadingProvider);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -53,7 +93,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 alignment: Alignment.centerLeft, child: Text('Email Address')),
             const SizedBox(height: 8),
             TextField(
-              controller: _emailController, // Attach controller
+              controller: _emailController,
               decoration: InputDecoration(
                 hintText: 'pristia@gmail.com',
                 border:
@@ -67,16 +107,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 alignment: Alignment.centerLeft, child: Text('Password')),
             const SizedBox(height: 8),
             TextField(
-              controller: _passwordController, // Attach controller
+              controller: _passwordController,
               obscureText: true,
               decoration: InputDecoration(
-                suffixIcon: const Icon(Icons.visibility_off_outlined),
                 border:
                     OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
               ),
             ),
 
-            // Remember Me Row
+            // Remember Me & Forgot Password
             Row(
               children: [
                 Checkbox(
@@ -87,13 +126,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const Text('Remember Me'),
                 const Spacer(),
                 TextButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(
+                    onPressed: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => ForgotPasswordScreen()),
-                      );
-                    },
+                            builder: (context) =>
+                                const ForgotPasswordScreen())),
                     child: const Text('Forgot Password')),
               ],
             ),
@@ -106,99 +143,35 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: ElevatedButton(
                 onPressed: isLoading
                     ? null
-                    : () async {
-                        ref.read(loginLoadingProvider.notifier).state = true;
-
-                        try {
-                          // 1. Call the login method from your repository
-                          final response =
-                              await ref.read(authRepositoryProvider).login(
-                                    _emailController.text,
-                                    _passwordController.text,
-                                  );
-
-                          if (mounted) {
-                            // 2. If successful, navigate to the Location Screen or Dashboard
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => LocationScreen()),
-                            );
-                          }
-                        } catch (e) {
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                  content:
-                                      Text("Login Failed: ${e.toString()}"),
-                                  backgroundColor: Colors.red),
-                            );
-                          }
-                        } finally {
-                          ref.read(loginLoadingProvider.notifier).state = false;
-                        }
-                      }, // Disable button if loading
+                    : _handleLogin, // FIXED: Pointing to the logic below
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1A6DFB),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(28)),
                 ),
                 child: isLoading
-                    ? const CircularProgressIndicator(
-                        color: Colors.white) // Show loader
+                    ? const CircularProgressIndicator(color: Colors.white)
                     : const Text('Sign In',
                         style: TextStyle(color: Colors.white, fontSize: 18)),
               ),
             ),
-            SizedBox(
-              height: 10,
-            ),
+
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("New to Theory Test?"),
+                const Text("New to Theory Test?"),
                 TextButton(
-                    onPressed: () {
-                      Navigator.push(
+                    onPressed: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => SignUpScreen()),
-                      );
-                    },
-                    child: Text("Create Account"))
+                        MaterialPageRoute(
+                            builder: (context) => const SignUpScreen())),
+                    child: const Text("Create Account"))
               ],
             )
           ],
         ),
       ),
     );
-  }
-
-  // Logic moved to a separate method for readability
-  Future<void> _handleLogin() async {
-    final email = _emailController.text.trim();
-    final password = _passwordController.text.trim();
-
-    if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in all fields')),
-      );
-      return;
-    }
-
-    ref.read(loginLoadingProvider.notifier).state = true;
-
-    try {
-      await ref.read(authRepositoryProvider).login(email, password);
-      if (mounted) {
-        Navigator.of(context).pushReplacementNamed('/dashboard');
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(e.toString())));
-      }
-    } finally {
-      ref.read(loginLoadingProvider.notifier).state = false;
-    }
   }
 }

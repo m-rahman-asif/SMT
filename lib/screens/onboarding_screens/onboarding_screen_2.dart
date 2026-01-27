@@ -17,7 +17,7 @@ class OnboardingScreen2 extends StatelessWidget {
       onButtonPressed: () {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const LoginScreen()),
+          MaterialPageRoute(builder: (context) => LoginScreen()),
         );
       },
     );

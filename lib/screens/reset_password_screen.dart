@@ -3,12 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smt/providers/APIrepository.dart';
 import 'package:smt/providers/login_provider.dart';
 import 'package:smt/screens/verify_code_screen.dart';
+import 'package:smt/widget_templates/success_dialog.dart';
 
 
 
 class ResetPasswordScreen extends ConsumerStatefulWidget {
-  final String email; // Add this line
-  const ResetPasswordScreen({super.key, required this.email}); // Update constructor
+  final String email;
+  final String token; // Added token field
+
+  const ResetPasswordScreen({
+    super.key, 
+    required this.email, 
+    required this.token, // Added to constructor
+  });
 
   @override
   ConsumerState<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
@@ -85,36 +92,31 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
   }
 
  void _handleSubmit() async {
-  if (_newPassController.text.isEmpty || _newPassController.text.length < 8) {
-    _showError("Password must be at least 8 characters");
-    return;
-  }
-
   if (_newPassController.text != _confirmPassController.text) {
     _showError("Passwords do not match!");
     return;
   }
+  
+  if (_newPassController.text.length < 8) {
+    _showError("Password too short!");
+    return;
+  }
 
   ref.read(loginLoadingProvider.notifier).state = true;
-
   try {
-    await ref.read(authRepositoryProvider).forgotPassword(_newPassController.text);
+    // Calling the API with the token we got from the code screen
+    await ref.read(authRepositoryProvider).completePasswordReset(
+      widget.email, 
+      widget.token, 
+      _newPassController.text
+    );
 
     if (mounted) {
-      // 2. Show the specific success message you wanted
+      // Since you don't want a success dialog, we go back to login
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Success! Verification code sent to your email."),
-          backgroundColor: Colors.green,
-        ),
+        const SnackBar(content: Text("Success! Please login with your new password."), backgroundColor: Colors.green),
       );
-
-      // 3. Go back to Login so they can use the new password
-      Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => VerifyCodeScreen(email: widget.email)),
-                            );
+      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
     }
   } catch (e) {
     _showError(e.toString());

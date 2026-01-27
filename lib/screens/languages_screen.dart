@@ -2,10 +2,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import "package:smt/providers/language_provider.dart";
 import 'package:flutter/material.dart';
 import "package:smt/models/language_model.dart";
+import 'package:smt/screens/home_screen.dart';
 
 class LanguageSelectionScreen extends ConsumerWidget {
-  const LanguageSelectionScreen({super.key});
+  final String userId; // 1. Add this field
 
+  const LanguageSelectionScreen({super.key, required this.userId});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedCode = ref.watch(selectedLanguageProvider);
@@ -74,9 +76,11 @@ class LanguageSelectionScreen extends ConsumerWidget {
               height: 56,
               child: ElevatedButton(
                 onPressed: () {
-                  // HERE is your UPDATE operation
-                  // ref.read(authRepositoryProvider).updateUser(userId, {'language': selectedCode});
-                  Navigator.pushNamed(context, '/location');
+                   Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => HomeScreen(userId: userId)),
+                            );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1A6DFB),

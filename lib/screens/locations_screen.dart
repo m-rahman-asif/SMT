@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:smt/screens/languages_screen.dart';
 
 class LocationScreen extends StatelessWidget {
-  const LocationScreen({super.key});
+  final String userId; // Add this
+
+  const LocationScreen({super.key, required this.userId});
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +53,7 @@ class LocationScreen extends StatelessWidget {
             TextButton(
               onPressed: () => Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => LanguageSelectionScreen()),
+        MaterialPageRoute(builder: (context) => LanguageSelectionScreen(userId: userId)),
       ),
               child: const Text(
                 'Skip, Not Now',

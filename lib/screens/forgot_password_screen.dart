@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smt/providers/APIrepository.dart';
 import 'package:smt/providers/login_provider.dart';
 import 'package:smt/screens/reset_password_screen.dart';
+import 'package:smt/screens/verify_code_screen.dart';
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
@@ -81,21 +82,26 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   }
 
  Future<void> _handleReset() async {
-  if (_emailController.text.isEmpty || !_emailController.text.contains('@')) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Please enter a valid email")),
-    );
+  final email = _emailController.text.trim();
+  if (email.isEmpty || !email.contains('@')) {
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Valid email required")));
     return;
   }
 
-  // Just navigate directly to the Reset Password Screen
-  Navigator.push(
-  context,
-  MaterialPageRoute(
-    builder: (context) => ResetPasswordScreen(
-      email: _emailController.text, // Pass the email here
-    ),
-  ),
-);
+  ref.read(loginLoadingProvider.notifier).state = true;
+  try {
+    await ref.read(authRepositoryProvider).requestPasswordReset(email);
+    if (mounted) {
+      // Navigate to VERIFY code screen first, not reset password screen
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => VerifyCodeScreen(email: email)),
+      );
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+  } finally {
+    ref.read(loginLoadingProvider.notifier).state = false;
+  }
 }
 }
