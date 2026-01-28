@@ -13,7 +13,7 @@ class SuccessDialog extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.onContinue,
-    this.showCloseButton = false, // Default to false for Reset Password
+    this.showCloseButton = false,
   });
 
   @override
@@ -54,9 +54,11 @@ class SuccessDialog extends StatelessWidget {
                 onPressed: onContinue,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1A6DFB),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(28)),
                 ),
-                child: const Text("Continue", style: TextStyle(color: Colors.white, fontSize: 16)),
+                child: const Text("Continue",
+                    style: TextStyle(color: Colors.white, fontSize: 16)),
               ),
             ),
           ],

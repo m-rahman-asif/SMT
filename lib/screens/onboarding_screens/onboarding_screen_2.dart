@@ -10,7 +10,8 @@ class OnboardingScreen2 extends StatelessWidget {
     return BaseOnboardingScreen(
       imagePath: 'assets/images/obs2.png',
       title: 'Explore your new skill\ntoday',
-      description: "Our platform is designed to help you explore new skills. Let's learn & grow with Eduline!",
+      description:
+          "Our platform is designed to help you explore new skills. Let's learn & grow with Eduline!",
       buttonText: 'Get Started',
       currentIndex: 1,
       totalDots: 2,

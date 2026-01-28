@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:smt/screens/languages_screen.dart';
 
 class LocationScreen extends StatelessWidget {
-  final String userId; // Add this
+  final String userId;
 
   const LocationScreen({super.key, required this.userId});
 
@@ -15,9 +15,8 @@ class LocationScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // The Map/Location Image
             Image.asset(
-              'assets/images/maps.png', // Placeholder for your map asset
+              'assets/images/maps.png',
               height: 200,
             ),
             const SizedBox(height: 40),
@@ -32,32 +31,32 @@ class LocationScreen extends StatelessWidget {
               style: TextStyle(color: Colors.grey, fontSize: 16, height: 1.5),
             ),
             const SizedBox(height: 40),
-            // Enable Button
             SizedBox(
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
-                onPressed: () {
-                  // Logic to request actual GPS permission goes here
-                  Navigator.pushReplacementNamed(context, '/dashboard');
-                },
+                onPressed: () {},
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1A6DFB),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(28)),
                 ),
-                child: const Text('Enable', style: TextStyle(color: Colors.white, fontSize: 18)),
+                child: const Text('Enable',
+                    style: TextStyle(color: Colors.white, fontSize: 18)),
               ),
             ),
             const SizedBox(height: 20),
-            // Skip Button
             TextButton(
               onPressed: () => Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LanguageSelectionScreen(userId: userId)),
-      ),
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        LanguageSelectionScreen(userId: userId)),
+              ),
               child: const Text(
                 'Skip, Not Now',
-                style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w500),
+                style: TextStyle(
+                    color: Colors.black54, fontWeight: FontWeight.w500),
               ),
             ),
           ],

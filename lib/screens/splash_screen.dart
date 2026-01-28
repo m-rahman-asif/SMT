@@ -8,13 +8,12 @@ class SplashScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Listen for initialization to finishs
     ref.listen(splashScreenProvider, (previous, next) {
       if (next.hasValue && next.value == true) {
-         Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => OnboardingScreen1()),
-      );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => OnboardingScreen1()),
+        );
       }
     });
 
@@ -49,7 +48,6 @@ class SplashScreen extends ConsumerWidget {
                 ),
               ),
               const Spacer(flex: 2),
-              // Custom Loading Indicator (matching the blue dots in your image)
               const CircularProgressIndicator(
                 strokeWidth: 3,
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),

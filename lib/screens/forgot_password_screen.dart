@@ -4,15 +4,17 @@ import 'package:smt/providers/APIrepository.dart';
 import 'package:smt/providers/login_provider.dart';
 import 'package:smt/screens/reset_password_screen.dart';
 import 'package:smt/screens/verify_code_screen.dart';
+
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  ConsumerState<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  ConsumerState<ForgotPasswordScreen> createState() =>
+      _ForgotPasswordScreenState();
 }
 
 class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
-  final _emailController = TextEditingController(text: 'pristia@gmail.com');
+  final _emailController = TextEditingController();
 
   @override
   void dispose() {
@@ -51,13 +53,16 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               ),
             ),
             const SizedBox(height: 40),
-            const Text('Email Address', style: TextStyle(fontWeight: FontWeight.w500)),
+            const Text('Email Address',
+                style: TextStyle(fontWeight: FontWeight.w500)),
             const SizedBox(height: 8),
             TextField(
               controller: _emailController,
               decoration: InputDecoration(
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               ),
             ),
             const SizedBox(height: 40),
@@ -68,11 +73,13 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 onPressed: isLoading ? null : _handleReset,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1A6DFB),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(28)),
                 ),
-                child: isLoading 
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text('Continue', style: TextStyle(color: Colors.white, fontSize: 18)),
+                child: isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text('Continue',
+                        style: TextStyle(color: Colors.white, fontSize: 18)),
               ),
             ),
           ],
@@ -81,27 +88,29 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     );
   }
 
- Future<void> _handleReset() async {
-  final email = _emailController.text.trim();
-  if (email.isEmpty || !email.contains('@')) {
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Valid email required")));
-    return;
-  }
-
-  ref.read(loginLoadingProvider.notifier).state = true;
-  try {
-    await ref.read(authRepositoryProvider).requestPasswordReset(email);
-    if (mounted) {
-      // Navigate to VERIFY code screen first, not reset password screen
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => VerifyCodeScreen(email: email)),
-      );
+  Future<void> _handleReset() async {
+    final email = _emailController.text.trim();
+    if (email.isEmpty || !email.contains('@')) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("Valid email required")));
+      return;
     }
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
-  } finally {
-    ref.read(loginLoadingProvider.notifier).state = false;
+
+    ref.read(loginLoadingProvider.notifier).state = true;
+    try {
+      await ref.read(authRepositoryProvider).requestPasswordReset(email);
+      if (mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => VerifyCodeScreen(email: email)),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      ref.read(loginLoadingProvider.notifier).state = false;
+    }
   }
-}
 }

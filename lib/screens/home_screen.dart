@@ -7,8 +7,7 @@ import 'package:smt/screens/locations_screen.dart';
 import 'package:smt/screens/signup_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
-  final String userId; // Pass the ID received during Login or Signup
-
+  final String userId;
   const HomeScreen({super.key, required this.userId});
 
   @override
@@ -26,18 +25,21 @@ class HomeScreen extends ConsumerWidget {
                 "name": "Updated User",
                 "data": {"password": "newPassword123", "email": "user@test.com"}
               });
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Account Updated!")));
+              ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Account Updated!")));
             },
           ),
-          
+
           // DELETE BUTTON
           ListTile(
             leading: const Icon(Icons.delete, color: Colors.red),
-            title: const Text("Delete Account", style: TextStyle(color: Colors.red)),
+            title: const Text("Delete Account",
+                style: TextStyle(color: Colors.red)),
             onTap: () async {
               await ref.read(authRepositoryProvider).deleteAccount(userId);
               Navigator.of(context).pushReplacementNamed('/login');
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Account Deleted!")));
+              ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Account Deleted!")));
             },
           ),
         ],

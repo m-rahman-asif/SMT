@@ -27,7 +27,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     super.dispose();
   }
 
-  // Professional Logic: Update strength bar as user types
   void _checkPassword(String value) {
     double strength = 0;
     if (value.length >= 8) strength += 0.25;
@@ -39,7 +38,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   }
 
   void _showSuccessDialog(BuildContext context, String id) {
-    // Added String id
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -47,7 +45,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
         imagePath: 'assets/images/success_signup.png',
         title: "Successfully Registered",
         subtitle:
-            "Your account (ID: $id) has been registered successfully!", // Optional: use the id
+            "Your account has been registered successfully, now let's enjoy our features!",
         showCloseButton: true,
         onContinue: () {
           Navigator.pushReplacement(
@@ -82,13 +80,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 'Let\'s join to Eduline learning ecosystem & meet our professional mentor. It\'s Free!',
                 style: TextStyle(color: Colors.grey)),
             const SizedBox(height: 32),
-
-            _buildField('Email Address', _emailController, 'pristia@gmail.com'),
+            _buildField('Email Address', _emailController, 'Enter your email'),
             const SizedBox(height: 20),
-            _buildField('Full Name', _nameController, 'Pristia Candra'),
+            _buildField('Full Name', _nameController, 'Enter your name'),
             const SizedBox(height: 20),
-
-            // Password Field
             const Text('Password',
                 style: TextStyle(fontWeight: FontWeight.w500)),
             const SizedBox(height: 8),
@@ -109,8 +104,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
               ),
             ),
             const SizedBox(height: 12),
-
-            // Password Strength Indicator
             Row(
               children: List.generate(
                   4,
@@ -129,14 +122,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
             ),
             const SizedBox(height: 8),
             Row(
-              crossAxisAlignment: CrossAxisAlignment
-                  .start, // Align icon with the first line of text
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Icon(Icons.check_circle_outline,
                     size: 16,
                     color: strength >= 0.5 ? Colors.green : Colors.grey),
                 const SizedBox(width: 8),
-                // THIS IS THE FIX:
                 const Expanded(
                   child: Text(
                     'At least 8 characters with a combination of letters and numbers',
@@ -145,55 +136,60 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 ),
               ],
             ),
-
             const SizedBox(height: 40),
             SizedBox(
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
                 onPressed: isLoading
-    ? null
-    : () async {
-        // Capture values at the exact moment of tap
-        final String nameValue = _nameController.text.trim();
-        final String emailValue = _emailController.text.trim().toLowerCase();
-        final String passwordValue = _passController.text.trim();
+                    ? null
+                    : () async {
+                        final String nameValue = _nameController.text.trim();
+                        final String emailValue =
+                            _emailController.text.trim().toLowerCase();
+                        final String passwordValue =
+                            _passController.text.trim();
 
-        // THIS PRINT IS KEY: Check your console for this line!
-        print("BUTTON TAP -> Name: '$nameValue', Email: '$emailValue'");
+                        print(
+                            "BUTTON TAP -> Name: '$nameValue', Email: '$emailValue'");
 
-        if (emailValue.isEmpty || nameValue.isEmpty || passwordValue.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Please fill in all fields")),
-          );
-          return;
-        }
+                        if (emailValue.isEmpty ||
+                            nameValue.isEmpty ||
+                            passwordValue.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text("Please fill in all fields")),
+                          );
+                          return;
+                        }
 
-        ref.read(loginLoadingProvider.notifier).state = true;
+                        ref.read(loginLoadingProvider.notifier).state = true;
 
-        try {
-          final result = await ref.read(authRepositoryProvider).register(
-                nameValue, // Passing the local variable we just captured
-                emailValue,
-                passwordValue,
-              );
+                        try {
+                          final result =
+                              await ref.read(authRepositoryProvider).register(
+                                    nameValue,
+                                    emailValue,
+                                    passwordValue,
+                                  );
 
-          if (mounted) {
-            _showSuccessDialog(context, result['id']?.toString() ?? 'Success');
-          }
-        } catch (e) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                backgroundColor: Colors.red,
-                content: Text(e.toString()),
-              ),
-            );
-          }
-        } finally {
-          ref.read(loginLoadingProvider.notifier).state = false;
-        }
-      },
+                          if (mounted) {
+                            _showSuccessDialog(
+                                context, result['id']?.toString() ?? 'Success');
+                          }
+                        } catch (e) {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                backgroundColor: Colors.red,
+                                content: Text(e.toString()),
+                              ),
+                            );
+                          }
+                        } finally {
+                          ref.read(loginLoadingProvider.notifier).state = false;
+                        }
+                      },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1A6DFB),
                   shape: RoundedRectangleBorder(
@@ -218,12 +214,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
         const SizedBox(height: 8),
         TextField(
           controller: controller,
-          
-          // --- ADD THESE TWO LINES HERE ---
           textInputAction: TextInputAction.next,
-          onChanged: (value) => {}, 
-          // --------------------------------
-          
+          onChanged: (value) => {},
           decoration: InputDecoration(
             hintText: hint,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
